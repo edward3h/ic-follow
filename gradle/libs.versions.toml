@@ -1,0 +1,9 @@
+[versions]
+
+[libraries]
+avaje-jsonb = "io.avaje:avaje-jsonb:1.10"
+avaje-jsonb-generator = "io.avaje:avaje-jsonb-generator:1.10"
+methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
+slf4j = "org.slf4j:slf4j-api:2.0.12"
+logevents = "org.logevents:logevents:0.5.2"
+jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
