@@ -14,6 +14,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -42,7 +43,19 @@ public class DefaultPairClient implements PairClient {
         singleUseLock.lock();
         try {
             Thread.sleep((random.nextInt(11) + 1) * 666);
-            return request(pair);
+            Exception last = null;
+            for (int i = 0; i < 3; i++) {
+                try {
+                    if (i > 0) {
+                        Thread.sleep(Duration.ofMinutes(1));
+                    }
+                    return request(pair);
+                } catch (Exception e) {
+                    last = e;
+                    LOGGER.warn("Request error", e);
+                }
+            }
+            throw new RuntimeException(last);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -50,21 +63,17 @@ public class DefaultPairClient implements PairClient {
         }
     }
 
-    private Result request(Pair pair) {
+    private Result request(Pair pair) throws IOException, InterruptedException {
         var uri = URI.create("https://neal.fun/api/infinite-craft/pair?" + queryString(pair));
         var request = HttpRequest.newBuilder(uri)
                 .GET()
                 .build();
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-            var body = response.body();
-            LOGGER.debug("Response body\n{}", body);
-            var item = itemJsonType.fromJson(body);
-            var inh = isNewHolderType.fromJson(body);
-            return new Result(pair, item, inh.isNew());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        var body = response.body();
+        LOGGER.debug("Response body\n{}", body);
+        var item = itemJsonType.fromJson(body);
+        var inh = isNewHolderType.fromJson(body);
+        return new Result(pair, item, inh.isNew());
     }
 
     @Json

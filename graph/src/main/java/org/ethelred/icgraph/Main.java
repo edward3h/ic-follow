@@ -61,9 +61,9 @@ public class Main implements Runnable {
             items.addAll(allResults(pairs));
         }
 
-//        var test = node("Train");
-//        Set<Node> incoming = graph.incomingEdgesOf(test).stream().map(graph::getEdgeSource).filter(distances::containsKey).collect(Collectors.toSet());
-//        LOGGER.info("{}\nsize {}", incoming, incoming.size());
+        var test = node("Human");
+        Set<Node> incoming = graph.incomingEdgesOf(test).stream().map(graph::getEdgeSource).filter(distances::containsKey).collect(Collectors.toSet());
+        LOGGER.info("{}\nsize {}", incoming, incoming.size());
 
     }
 
